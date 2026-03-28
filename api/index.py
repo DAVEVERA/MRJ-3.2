@@ -18,8 +18,6 @@ from pathlib import Path
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from dotenv import load_dotenv
-from google import genai
-from google.genai import types as genai_types
 
 # Load .env before anything else so API keys are available
 # Whether the app is started locally, via Vercel, or from any working directory
@@ -27,9 +25,26 @@ ROOT = Path(__file__).resolve().parent.parent  # Go up one level from api/ to pr
 load_dotenv(ROOT / ".env")
 sys.path.insert(0, str(ROOT))
 
-import core
-from src.AI.analyse_claude import run_analysis_pipeline
-from src.AI.utils import save_upload_locally, upload_to_supabase
+# Import AI modules only when needed (lazy loading)
+# This prevents startup errors if API keys aren't set yet
+core = None
+run_analysis_pipeline = None
+save_upload_locally = None
+upload_to_supabase = None
+
+def lazy_load_modules():
+    global core, run_analysis_pipeline, save_upload_locally, upload_to_supabase
+    if core is None:
+        try:
+            import core as _core
+            from src.AI.analyse_claude import run_analysis_pipeline as _run_analysis
+            from src.AI.utils import save_upload_locally as _save_upload, upload_to_supabase as _upload_supabase
+            core = _core
+            run_analysis_pipeline = _run_analysis
+            save_upload_locally = _save_upload
+            upload_to_supabase = _upload_supabase
+        except Exception as e:
+            raise RuntimeError(f"Failed to load AI modules: {e}")
 
 
 # ── APP SETUP ───────────────────────────────────────────────────
@@ -63,6 +78,11 @@ def analyze():
     Receive a base64 image, upload it, and run the 9-phase analysis pipeline.
     Returns an AnalysisResult JSON object.
     """
+    try:
+        lazy_load_modules()
+    except RuntimeError as e:
+        return jsonify({"error": f"AI services not available: {e}"}), 503
+
     data = request.get_json(silent=True) or {}
     image_b64 = data.get("image")
 
@@ -143,6 +163,8 @@ def _run_gemini_render(
     Build the render prompt from core.py maps and call Gemini 2.5 Flash Image.
     """
     import json as _json
+    from google import genai
+    from google.genai import types as genai_types
 
     genai.configure(api_key=api_key)
 
