@@ -34,7 +34,10 @@ from src.AI.utils import save_upload_locally, upload_to_supabase
 
 # ── APP SETUP ───────────────────────────────────────────────────
 
-app = Flask(__name__, static_folder="../static", static_url_path="")
+STATIC_FOLDER = ROOT / "static"
+MEDIA_FOLDER = ROOT / "media"
+
+app = Flask(__name__, static_folder=str(STATIC_FOLDER), static_url_path="")
 CORS(app)
 
 
@@ -42,14 +45,14 @@ CORS(app)
 
 @app.route("/")
 def index():
-    return send_from_directory("../static", "index.html")
+    return send_from_directory(str(STATIC_FOLDER), "index.html")
 
 
 # ── MEDIA ASSETS ─────────────────────────────────────────────────
 
 @app.route("/media/<path:filename>")
 def serve_media(filename):
-    return send_from_directory("../media", filename)
+    return send_from_directory(str(MEDIA_FOLDER), filename)
 
 
 # ── PHASE 1-8: ANALYZE ──────────────────────────────────────────

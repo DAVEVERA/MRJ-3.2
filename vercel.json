@@ -1,5 +1,23 @@
 {
   "env": {
     "PYTHONUNBUFFERED": "1"
-  }
+  },
+  "routes": [
+    {
+      "src": "/media/(.*)",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/analyze",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/render",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/",
+      "dest": "/api/index.py"
+    }
+  ]
 }
