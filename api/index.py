@@ -63,19 +63,6 @@ def index():
     return send_from_directory(str(STATIC_FOLDER), "index.html")
 
 
-# ── DEBUG: Check paths ──────────────────────────────────────────
-
-@app.route("/debug-path")
-def debug_path():
-    files = [f.name for f in STATIC_FOLDER.glob("*")] if STATIC_FOLDER.exists() else []
-    return jsonify({
-        "ROOT": str(ROOT),
-        "STATIC_FOLDER": str(STATIC_FOLDER),
-        "STATIC_EXISTS": STATIC_FOLDER.exists(),
-        "STATIC_FILES": files
-    })
-
-
 # ── STATIC FILES (CSS, JS) ──────────────────────────────────────
 
 @app.route("/<filename>")
