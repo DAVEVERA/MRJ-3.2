@@ -63,12 +63,27 @@ def index():
     return send_from_directory(str(STATIC_FOLDER), "index.html")
 
 
+# ── DEBUG: Check paths ──────────────────────────────────────────
+
+@app.route("/debug-path")
+def debug_path():
+    return jsonify({
+        "ROOT": str(ROOT),
+        "STATIC_FOLDER": str(STATIC_FOLDER),
+        "STATIC_EXISTS": STATIC_FOLDER.exists(),
+        "STATIC_FILES": list(STATIC_FOLDER.glob("*")) if STATIC_FOLDER.exists() else []
+    })
+
+
 # ── STATIC FILES (CSS, JS) ──────────────────────────────────────
 
 @app.route("/<filename>")
 def serve_static(filename):
     """Serve CSS, JS, and other static files from static folder"""
-    return send_from_directory(str(STATIC_FOLDER), filename)
+    try:
+        return send_from_directory(str(STATIC_FOLDER), filename)
+    except Exception as e:
+        return jsonify({"error": str(e), "folder": str(STATIC_FOLDER), "filename": filename}), 404
 
 
 # ── MEDIA ASSETS ─────────────────────────────────────────────────
