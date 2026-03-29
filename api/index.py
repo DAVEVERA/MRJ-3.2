@@ -63,6 +63,15 @@ def index():
     return send_from_directory(str(STATIC_FOLDER), "index.html")
 
 
+# ── FONTS ───────────────────────────────────────────────────────
+
+@app.route("/fonts/<filename>")
+def serve_fonts(filename):
+    """Serve font files from static/fonts folder"""
+    font_folder = STATIC_FOLDER / "fonts"
+    return send_from_directory(str(font_folder), filename)
+
+
 # ── STATIC FILES (CSS, JS) ──────────────────────────────────────
 
 @app.route("/<filename>")
