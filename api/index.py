@@ -67,11 +67,12 @@ def index():
 
 @app.route("/debug-path")
 def debug_path():
+    files = [f.name for f in STATIC_FOLDER.glob("*")] if STATIC_FOLDER.exists() else []
     return jsonify({
         "ROOT": str(ROOT),
         "STATIC_FOLDER": str(STATIC_FOLDER),
         "STATIC_EXISTS": STATIC_FOLDER.exists(),
-        "STATIC_FILES": list(STATIC_FOLDER.glob("*")) if STATIC_FOLDER.exists() else []
+        "STATIC_FILES": files
     })
 
 
