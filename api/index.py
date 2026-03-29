@@ -52,7 +52,7 @@ def lazy_load_modules():
 STATIC_FOLDER = ROOT / "static"
 MEDIA_FOLDER = ROOT / "media"
 
-app = Flask(__name__, static_folder=str(STATIC_FOLDER), static_url_path="")
+app = Flask(__name__)
 CORS(app)
 
 
@@ -61,6 +61,14 @@ CORS(app)
 @app.route("/")
 def index():
     return send_from_directory(str(STATIC_FOLDER), "index.html")
+
+
+# ── STATIC FILES (CSS, JS) ──────────────────────────────────────
+
+@app.route("/<filename>")
+def serve_static(filename):
+    """Serve CSS, JS, and other static files from static folder"""
+    return send_from_directory(str(STATIC_FOLDER), filename)
 
 
 # ── MEDIA ASSETS ─────────────────────────────────────────────────
